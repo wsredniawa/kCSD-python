@@ -29,8 +29,8 @@ def make_plot(ax, xx, yy, zz, title='True CSD', cmap=cm.bwr):
     ax.set_ylabel('Y ($\mu$m)')
     ax.set_title(title)
     if 'CSD' in title: 
-        plt.colorbar(im, orientation='vertical',  format='%.2f', ticks=[-0.02,0,0.02])
-    else: plt.colorbar(im, orientation='vertical',  format='%.1f', ticks=[-0.6,0,0.6])
+        plt.colorbar(im, orientation='horizontal',  format='%.2f', ticks=[-0.01,0,0.01])
+    else: plt.colorbar(im, orientation='horizontal',  format='%.1f', ticks=[-0.6,0,0.6])
     plt.scatter(ele_pos[:, 0], 
                 -(ele_pos[:, 1]-500),
                 s=0.8, color='black')
@@ -65,8 +65,7 @@ def plot_1D_pics(k, est_csd, est_pots, tp, Fs, cut=9):
                  # '  R: '+ str(k.R))
     ax1 = plt.subplot(122)
     set_axis(ax1, -0.05, 1.05, letter= 'D')
-    make_plot_spacetime(ax1, k.estm_x, k.estm_y, est_csd[cut,:,:], Fs,
-              title='Estimated CSD', cmap='bwr')
+    make_plot_spacetime(ax1, k.estm_x, k.estm_y, est_csd[cut,:,:], Fs, title='Estimated CSD', cmap='bwr')
     for lvl, name in zip([-500,-850,-2000], ['II/III', 'IV', 'V/VI']):
         plt.axhline(lvl, ls='--', color='grey')
         plt.text(340, lvl+20, name)
@@ -74,7 +73,7 @@ def plot_1D_pics(k, est_csd, est_pots, tp, Fs, cut=9):
     plt.xticks([250, 300, 350, 400], [-50, 0, 50, 100])
     ax2 = plt.subplot(121)
     set_axis(ax2, -0.05, 1.05, letter= 'C')
-    make_plot_spacetime(ax2, k.estm_x, k.estm_y, est_pots[cut,:,:],
+    make_plot_spacetime(ax2, k.estm_x, k.estm_y, est_pots[cut,:,:], Fs,
               title='Estimated LFP', cmap='PRGn')
     plt.axvline(tp/Fs*1000, ls='--', color ='grey', lw=2)
     plt.xlim(250, 400)
@@ -83,7 +82,7 @@ def plot_1D_pics(k, est_csd, est_pots, tp, Fs, cut=9):
     plt.savefig('figure_1D_pics', dpi=300)
 
 def plot_2D_pics(k, est_csd, est_pots, tp, Fs, cut, save=0):
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(8, 12))
     ax1 = plt.subplot(122)
     set_axis(ax1, -0.05, 1.05, letter= 'B')
     make_plot(ax1, k.estm_x, k.estm_y, est_csd[:,:,tp], 
@@ -102,14 +101,14 @@ def do_kcsd(ele_pos_for_csd, pots_for_csd, ele_limit):
     ele_position = ele_pos_for_csd[:ele_limit[1]][0::1]
     csd_pots = pots_for_csd[:ele_limit[1]][0::1]
     k = KCSD2D(ele_position, csd_pots,
-               h=1, sigma=1, R_init=32, lambd=1e-9,
+               h=1, sigma=1, R_init=48, lambd=1e-9,
                xmin= -42, xmax=42, gdx=4,
                ymin=0, ymax=4000, gdy=4)
     # k.L_curve(Rs=np.linspace(16, 48, 3), lambdas=np.logspace(-9, -3, 20))
     return k, k.values('CSD'), k.values('POT'), ele_position
 #%%
 if __name__ == '__main__':
-    lowpass = 0.5
+    lowpass = 1
     highpass = 300
     Fs = 30000
     resamp = 12
